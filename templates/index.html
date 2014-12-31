@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+        <form name="login" action="/" method="post">
+            Username: <input type="email" name="userid" autofocus />
+            <br />
+            Password: <input type="password" name="pswrd" />
+            <p>
+                Song Sources:
+                <br />
+                <input type="checkbox" name="library" value="True"> My Library
+                <br />
+                <input type="checkbox" name="playlists" value="True">Playlists
+                <br />
+                <input type="checkbox" name="thumbsup" value="True">Thumbs Up
+            </p>
+            <p>
+                Filters:
+                <br />
+                Artist: <input type="text" name="artist" />
+                <br />
+                Album: <input type="text" name="album" />
+                <br />
+                Play Count: <input type="number" name="playCount" min="0" />
+            </p>
+            <br />
+            <p>
+                Playlist Name:
+                <input type="text" name="title" />
+            </p>
+            <input type="submit" value="Generate Playlist" />
+            <input type="reset" value="Cancel" />
+        </form>
+</body>
+</html>
