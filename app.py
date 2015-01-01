@@ -2,12 +2,14 @@
 import json
 import gmusicapi
 
-from flask import Flask, request, jsonify, render_template, g
+from flask import Flask, request, make_response, render_template, g, jsonify
 
 app = Flask(__name__)
 
 
 def main(d):
+
+    rl = []
 
     try:
         g.api.login(d['userid'], d['pswrd'])
@@ -18,17 +20,20 @@ def main(d):
         l = get_song_list(d)
     except RuntimeError as e:
         return e.message
+    except gmusicapi.exceptions.NotLoggedIn:
+        return "Invaild Login Credentials"
 
     if d.get('playCount'):
         min_num = d.get('playCount')
         for track in l:
-            if track.get('playCount') > min_num:
-                if track.get('storeId'):
-                    l.append(track.get('storeId'))
-                else:
-                    l.append(track.get('id'))
+            if track is not None:
+                if track.get('playCount') > int(min_num):
+                    if track.get('storeId'):
+                        rl.append(track.get('storeId'))
+                    else:
+                        rl.append(track.get('id'))
 
-    l = list(set(l))
+    rl = list(set(rl))
 
     try:
         title = d['title'] if d.get('title') else 'New Playlist'
@@ -36,9 +41,9 @@ def main(d):
     except:
         return "Failed to create playlist"
 
-    g.api.add_songs_to_playlist(playlist, l)
+    results = g.api.add_songs_to_playlist(playlist, rl)
 
-    return jsonify(l)
+    return jsonify(results)
 
 
 def get_song_list(d):
@@ -53,19 +58,18 @@ def get_song_list(d):
         l = g.api.get_all_songs()
 
     if d.get('thumbsup'):
+        l = [] if l is None else l
         thumbs = g.api.get_thumbs_up_songs()
         for track in thumbs:
             l.append(track)
 
     if d.get('playlists'):
+        l = [] if l is None else l
         playlists = g.api.get_all_user_playlist_contents()
         for playlist in playlists:
             for track in playlist['tracks']:
                 track_info = track.get('track')
-                try:
-                    print track_info['title'], track_info['playCount']
-                except:
-                    pass
+                l.append(track_info)
 
     return l
 
@@ -90,5 +94,5 @@ def index():
 
 if __name__ == '__main__':
     app.debug = True
-    app.run(host='127.0.0.1', port=5280)
+    app.run(host='0.0.0.0', port=5280)
     #main(USERNAME, PASSWORD, 30)
