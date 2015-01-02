@@ -6,6 +6,12 @@ from datetime import datetime
 
 
 def main(request_args):
+    """
+    Main function that drives all filtering.  It is called by flask after
+    the user has chosen their filters.  Accepts request.form dictionary from
+    flask
+    """
+
     #pull filter vars from request_args
     play_count = request_args.get('play_count')
     artists = request_args.get('artist')
@@ -62,7 +68,10 @@ def main(request_args):
 
 
 def play_count_filter(play_count_min, song_list):
-
+    """
+    Filters a song list down by track playcount.  Accepts a positive integer
+    for play count minimum, and a list of track dictionaries.
+    """
     results = []
 
     for track in song_list:
@@ -74,7 +83,10 @@ def play_count_filter(play_count_min, song_list):
 
 
 def artist_filter(artists, song_list):
-
+    """
+    Filters a song list down by artist.  Accepts a comma seperated list
+    of artists, and a list of track dictionaries.
+    """
     results = []
 
     artist_list = map(lambda x: x.lower(), artists.split(','))
@@ -88,7 +100,10 @@ def artist_filter(artists, song_list):
 
 
 def album_filter(albums, song_list):
-
+    """
+    Filters a song list down by album.  Accepts a comma seperated list
+    of albums, and a list of track dictionaries.
+    """
     results = []
 
     album_list = map(lambda x: x.lower(), albums.split(','))
@@ -102,7 +117,11 @@ def album_filter(albums, song_list):
 
 
 def extract_song_ids(song_list):
-
+    """
+    Extracts the store ids or library ids and turns them into a list that can
+    be used as an argument for gmusicapi.create_playlist().  Accepts a list of
+    track dictionaries.
+    """
     results = []
 
     for track in song_list:
@@ -116,9 +135,14 @@ def extract_song_ids(song_list):
     return results
 
 
-def get_song_list(d):
-
+def get_song_list(request_args):
+    """
+    Assembles a list of track dictionaries from the users library, playlists,
+    and thumbs'd up list.  Accepts flask request.form dictionary.
+    """
     song_list = []
+
+    d = request_args
 
     if d.get('library') is None and d.get('thumbsup') is None \
        and d.get('playlists') is None:
